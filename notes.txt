@@ -1,0 +1,19 @@
+To set up these projects with python I need to first make a top level directory
+that will hold everything including the virtual environment folder, the .git
+folder and the one that is created by Django. Since I have installed the
+python3 version of virtualenv it will set the environment up with python3. I
+then need to activate the environment. To so this type
+`source env/bin/activate`.
+
+After this I need to install Django, this involves first running `pip install
+mysqlclient` which acts like the MySQLdb module in python2.7 and is the
+recommendation from Django with Python3. Outside the virtual environment I had
+to install with `sudo apt-get install python3-dev libmysqlclient-dev`, which
+reading the README.md on "githut.com/PyMySQL/mysqlclient-python".
+
+At this point I should be good to go. Meaning to run `python manage.py migrate`
+
+From there I have been following the tutorials.
+
+Also need to point out that the variable I assign in the model (classes) will
+be used throughout the class with self.[variable] like normal.
