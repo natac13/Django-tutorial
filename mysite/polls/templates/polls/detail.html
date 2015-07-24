@@ -1,13 +1,16 @@
 <h1>{{ question.question_text }}</h1>
 <p>Published on: {{ question.pub_date }}</p>
 <ul>
-<!-- A Not on how the method of question choice_set comes into play
+<!-- A Note on how the method of question choice_set comes into existence
 - This occurs in the polls/model.py file where I declare the classes themselves
 Since I made a class called Choice and gave it a foreign key which I assigned
 Question to it. Therefore each Choice has a question field in the model. Now
 the part that is a bit confusing is that Django's ORM follow this backwards and
 therefore Question ALSO has a field call choice_set where the choice is the name
 of the call.
+
+Also not question.choice_set.all is interpreted by HTML as the Python equivalent
+question.choice_set.all() function.
  -->
 {% for choice in question.choice_set.all %}
     <li>{{ choice.choice_text }}</li>
