@@ -17,3 +17,26 @@ From there I have been following the tutorials.
 
 Also need to point out that the variable I assign in the model (classes) will
 be used throughout the class with self.[variable] like normal.
+
+the list_display page of the admin site can be customized by adding in a
+[model]Admin class, which inherits from admin.ModelAdmin to the admin.py
+script. The fields themselves can be changed by adding attributes to the
+methods which are being listed out, by adding attributes to the method itself
+in model.py, just be careful of the indent level.
+
+Any default admin template can be overridden. This is done by copying the
+original from -- "test_project/env/lib/python3.4/site-packages/django/
+               contrib/admin/templates/admin" -- and put into my template
+folder in the project. Need to make sure the DIR in setting.py is changed.
+
+HOW TEMPLATES WORKS, URL REQUESTS
+- First start in the mysite/url.py, this tells Django to search the url after
+the domain name and then includes() a path to the specific apps urls.
+- At this point the app's(polls/url.py) url's will then take over the searching
+of the url from there. When it finds a given pattern it loads in a view from
+polls/views.py.
+- In the views file there are functions that have to return HttpResponse() or an
+Http404. In saying this render is a shortcut which returns a HttpResponse, also
+the got_object_or_404 is a shortcut to Python's try: find the object's record in
+the database and raise an exception of DoesNotExist(). It is really nice
+Django takes care of this.

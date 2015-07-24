@@ -33,7 +33,10 @@ class Question(models.Model):
 class Choice(models.Model):
 
     # These become the attributes of the class.
-    question = models.ForeignKey(Question)
+    # The related_name is the same as default. I just wanted to show how to
+    # rename the method made in Question. This is used in the template
+    # detail.html.
+    question = models.ForeignKey(Question, related_name='choice_set')
     choice_text = models.CharField(max_length=200)
     votes = models.IntegerField(default=0)
 

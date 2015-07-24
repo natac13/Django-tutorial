@@ -1,0 +1,12 @@
+Now we might be able to get away with putting out templates directly in the
+polls/templates (rather than creating another polls subdirectory), but it
+would actually be a bad idea. Django will choose the first template it finds
+whose name matches, and if you had a template with the same name in a different
+application, Django would be unable to distinguish between them. We need to be
+able to point Django at the right one, and the easiest way to ensure this is by
+namespacing them. That is, by putting those template inside another directory
+named for the application itself.
+
+Because of how app_directories is set up... with the true setting and looking in
+the apps for a templates directory. I can therefore refer to the templates by
+polls/index.html instead of polls/templates/polls/index.html like it really is.
