@@ -55,3 +55,6 @@ practice in Django to redirect but good for web development
 views. In general I will evaluate whether generic views are good for my project
 at the start and not half way through but the tutorial wanted to show the basics
 first before speeding the process up. Basic math -> calculator.
+- The problem this fixes is to deal with views they are generically searching the
+database according to parameters passed in the URL and then loading the template,
+and returning the rendered template.
