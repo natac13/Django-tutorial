@@ -47,3 +47,11 @@ could be numerous apps. all with a similar name for the urls. Like a details
 page for the polls and one for a blog, or even photos. To make sure Django knows
 which template I am referring to, the technique used is namespacing of the root
 urls in mysite/urls.py
+
+7. To redirect after successfully dealing with post data it is not just a good
+practice in Django to redirect but good for web development
+
+8. I will be using generic views system by Django which is an easier way to write
+views. In general I will evaluate whether generic views are good for my project
+at the start and not half way through but the tutorial wanted to show the basics
+first before speeding the process up. Basic math -> calculator.

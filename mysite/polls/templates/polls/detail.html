@@ -1,6 +1,5 @@
 <h1>{{ question.question_text }}</h1>
 <p>Published on: {{ question.pub_date }}</p>
-<ul>
 <!-- A Note on how the method of question choice_set comes into existence
 - This occurs in the polls/model.py file where I declare the classes themselves
 Since I made a class called Choice and gave it a foreign key which I assigned
@@ -12,8 +11,24 @@ of the call.
 Also not question.choice_set.all is interpreted by HTML as the Python equivalent
 question.choice_set.all() function.
  -->
-{% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }}</li>
-{% endfor %}
-</ul>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<form action="{% url 'polls:vote' question.id %}" method="POST"
+    accept-charset="utf-8">
+{% csrf_token %}
+{% for choice in question.choice_set.all %}
+<!-- label tag to go after radio inputs! -->
+    <input type="radio" name="choice" id="choice{{ forloop.counter }}"
+        value="{{ choice.id }}">
+    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+{% endfor %}
+<input type="submit" value="Vote">
+</form>
+<!-- How the form work is that the value of the input is set to the id of the
+choice. Therefore the POST will be choice=# where # is the id selected since
+there will be any many radio buttons with id=choice#
+
+When submitting POST they usually are for changing database data and therefore
+I need to concern myself with protecting the input. This is done very easily by
+Django. This is done by adding {% csrf_token %} to any POST form that targets an
+internal URL. It is a template tag.  -->
