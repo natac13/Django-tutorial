@@ -1,4 +1,4 @@
-To set up these projects with python I need to first make a top level directory
+1. To set up these projects with python I need to first make a top level directory
 that will hold everything including the virtual environment folder, the .git
 folder and the one that is created by Django. Since I have installed the
 python3 version of virtualenv it will set the environment up with python3. I
@@ -15,21 +15,21 @@ At this point I should be good to go. Meaning to run `python manage.py migrate`
 
 From there I have been following the tutorials.
 
-Also need to point out that the variable I assign in the model (classes) will
+2. Also need to point out that the variable I assign in the model (classes) will
 be used throughout the class with self.[variable] like normal.
 
-the list_display page of the admin site can be customized by adding in a
+3. the list_display page of the admin site can be customized by adding in a
 [model]Admin class, which inherits from admin.ModelAdmin to the admin.py
 script. The fields themselves can be changed by adding attributes to the
 methods which are being listed out, by adding attributes to the method itself
 in model.py, just be careful of the indent level.
 
-Any default admin template can be overridden. This is done by copying the
+4. Any default admin template can be overridden. This is done by copying the
 original from -- "test_project/env/lib/python3.4/site-packages/django/
                contrib/admin/templates/admin" -- and put into my template
 folder in the project. Need to make sure the DIR in setting.py is changed.
 
-HOW TEMPLATES WORKS, URL REQUESTS
+5. HOW TEMPLATES WORKS, URL REQUESTS
 - First start in the mysite/url.py, this tells Django to search the url after
 the domain name and then includes() a path to the specific apps urls.
 - At this point the app's(polls/url.py) url's will then take over the searching
@@ -40,3 +40,10 @@ Http404. In saying this render is a shortcut which returns a HttpResponse, also
 the got_object_or_404 is a shortcut to Python's try: find the object's record in
 the database and raise an exception of DoesNotExist(). It is really nice
 Django takes care of this.
+
+6. NAMESPACING URLS
+This tutorial has only one app. which is polls. In a normal Django project there
+could be numerous apps. all with a similar name for the urls. Like a details
+page for the polls and one for a blog, or even photos. To make sure Django knows
+which template I am referring to, the technique used is namespacing of the root
+urls in mysite/urls.py

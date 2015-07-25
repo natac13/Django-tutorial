@@ -2,7 +2,17 @@
     <ul>
     {% for question in latest_question_list %}
         <li>
-            <a href="/polls/{{ question.id }}/">{{ question.question_text }}</a>
+<!-- Instead of hard coding this link I can use the name I gave to the url in
+polls/urls.py. This is done by using the {% url %} tag.
+
+This means that now if I want to change the url path to get to the details page
+I only need to change the regex pattern in the polls/url.py script instead of
+doing templates!
+
+The polls: part is the namespacing of the template which is further explained
+in my notes as Note 6. -->
+            <a href="{% url 'polls:detail' question.id %}">
+                {{ question.question_text }}</a>
         </li>
     {% endfor %}
     </ul>
