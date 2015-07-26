@@ -3,4 +3,4 @@ env
 *.pyc
 __pycached__
 *.sublime*
-settings*.py
+login.json

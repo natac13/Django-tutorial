@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-
+from django.views import generic
 from .models import Question, Choice
 
 # Views are really the controller in the MVC model. Therefore these can read
@@ -10,7 +10,62 @@ from .models import Question, Choice
 # file. Can also use any Python library I want. All views needs to return is
 # an HttpResponse() or an exception Http404
 
-# Create your views here.
+# NOTE 9 explains how these classes are created without me doing anything....
+
+
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by('-pub_date')[:5]
+
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'polls/results.html'
+
+
+def vote(request, question_id):
+    q = get_object_or_404(Question, pk=question_id)
+    # get Question off PRIMARY KEY
+    #
+    # request.POST is a dictionary-like object which gives me access to the
+    # submitted date by referring to it by the name given.
+    try:
+        selected_choice = q.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        dict_vars = {
+            'question': q,
+            'error_message': "You didn't select a choice.",
+        }
+        return render(request, 'polls/detail.html', dict_vars)
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return a HttpResponseRedirect after successfully dealing with
+        # POST data. NOTE 7. This prevents data from being posted twice if a
+        # user hits the Back button.
+        #
+        # reverse() is used so I do not have to hard code a URL in the views
+        # function. It is given the name of the view(assigned in polls/url.py)
+        # and the variable portion that it is looking for. It will return
+        # something like '/polls/3/resutls'
+        # reverse() also allow me to use the name urls instead of hard coding.
+        # reverse will recall the page via polls/urls.py which then will call
+        # the result function again with given args, or kwargs.
+        # With render above it is directly calling the template itself. Were
+        # vote() will utilize HttpResposeRedirect() to use the polls/urls.py
+        # path instead.
+        return HttpResponseRedirect(reverse('polls:results', args=(q.id,)))
+
 # These are the functions that get called by ulr() when it matches the regular
 # expression that is given as the first argument.
 # The request argument I think has to be there and then the other arguments
@@ -51,40 +106,3 @@ def detail(request, question_id):
 def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/results.html', {'question': question})
-
-
-def vote(request, question_id):
-    q = get_object_or_404(Question, pk=question_id)
-    # get Question off PRIMARY KEY
-    #
-    # request.POST is a dictionary-like object which gives me access to the
-    # submitted date by referring to it by the name given.
-    try:
-        selected_choice = q.choice_set.get(pk=request.POST['choice'])
-    except (KeyError, Choice.DoesNotExist):
-        # Redisplay the question voting form.
-        dict_vars = {
-            'question': q,
-            'error_message': "You didn't select a choice.",
-        }
-        return render(request, 'polls/detail.html', dict_vars)
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return a HttpResponseRedirect after successfully dealing with
-        # POST data. NOTE 7. This prevents data from being posted twice if a
-        # user hits the Back button.
-        #
-        # reverse() is used so I do not have to hard code a URL in the views
-        # function. It is given the name of the view(assigned in polls/url.py)
-        # and the variable portion that it is looking for. It will return
-        # something like '/polls/3/resutls'
-        # reverse() also allow me to use the name urls instead of hard coding.
-        # reverse will recall the page via polls/urls.py which then will call
-        # the result function again with given args, or kwargs.
-        # With render above it is directly calling the template itself. Were
-        # vote() will utilize HttpResposeRedirect() to use the polls/urls.py
-        # path instead.
-        return HttpResponseRedirect(reverse('polls:results', kwargs={
-            'question_id': q.id,
-            }))
