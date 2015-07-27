@@ -20,8 +20,11 @@ class Question(models.Model):
 
     def was_published_recently(self):
         """ Returns true if the pub_date is within a day"""
-
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+        now = timezone.now()
+        # pub_date <= now means nothing that is in the future, or > now
+        # and before hand yesterday(now-timedelta(day=1)) has to be <= pub_date
+        # therefore if pub_date is less than it occurred longer than yesterday.
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
     # These are method attributes which help Django display on the admin
     # page.
     # be careful of the indent
