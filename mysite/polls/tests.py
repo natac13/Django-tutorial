@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.test import TestCase
 
-from .models import Question
+from .models import Question, Choice
 
 # I run in the terminal `python manage.py test polls`, it look for a subclass
 # of the django.test.TestCase class, creates a special testing database.
@@ -43,7 +43,12 @@ def create_question(question_text, days):
     return Question.objects.create(question_text=question_text, pub_date=time)
 
 
-class QuestionTestViews(TestCase):
+def create_choice_for_question(question, choice_text):
+    """Creates a Choice for a given Question object."""
+    return Choice.objects.create(question=question, choice_text=choice_text)
+
+
+class QuestionIndexViewsTest(TestCase):
     # NOTE 10  #######
 
     def test_index_view_with_no_question(self):
@@ -65,36 +70,55 @@ class QuestionTestViews(TestCase):
                             status_code=200)
         self.assertQuerysetEqual(response.context['latest_question_list'], [])
 
-    def test_index_view_with_past_question(self):
+    def test_index_view_with_past_question_no_choice(self):
         """Questions with a pub_date in the past should appear in the view"""
-        create_question(question_text="Past Question", days=-30)
+        q = create_question(question_text="Past Question", days=-30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertNotContains(response, q.question_text, status_code=200)
+
+    def test_index_view_with_past_question_with_choice(self):
+        """Questions with a pub_date in the past should appear in the view"""
+        q = create_question(question_text="Past Question", days=-30)
+        create_choice_for_question(question=q, choice_text="Choice P1")
         response = self.client.get(reverse('polls:index'))
         self.assertContains(response, "Past Question", status_code=200)
         self.assertQuerysetEqual(response.context['latest_question_list'],
                                  ['<Question: Past Question>'])
 
-    def test_index_view_with_future_and_past_question(self):
+    def test_index_view_with_future_and_past_question_with_choice(self):
         """Only the past question should appear"""
-        create_question(question_text="Past Question", days=-30)
+        q = create_question(question_text="Past Question", days=-30)
+        create_choice_for_question(question=q, choice_text="Choice P1")
         create_question(question_text="Future Question", days=30)
         response = self.client.get(reverse('polls:index'))
         self.assertContains(response, "Past Question", status_code=200)
         self.assertQuerysetEqual(response.context['latest_question_list'],
                                  ['<Question: Past Question>'])
 
-    def test_index_view_with_two_past_questions(self):
+    def test_index_view_with_two_past_questions_one_with_choice(self):
         """Both of the past questions should appear."""
-        create_question(question_text="Past 1", days=-10)
+        q = create_question(question_text="Past 1", days=-10)
+        create_choice_for_question(question=q, choice_text="Choice P1")
         create_question(question_text="Past 2", days=-30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(response.context['latest_question_list'],
+                                 ['<Question: Past 1>'])
+
+    def test_index_view_with_two_past_questions_with_choices(self):
+        """Both of the past questions should appear."""
+        q = create_question(question_text="Past 1", days=-10)
+        create_choice_for_question(question=q, choice_text="Choice P1")
+        q2 = create_question(question_text="Past 2", days=-30)
+        create_choice_for_question(question=q2, choice_text="Choice P2")
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(response.context['latest_question_list'],
                                  ['<Question: Past 1>', '<Question: Past 2>']
                                  )
 
 
-class QuestionIndexDetailTest(TestCase):
+class QuestionDetailViewTest(TestCase):
 
-    def test_detial_view_with_a_future_question(self):
+    def test_detail_view_with_a_future_question(self):
         """The Detail view that points to a question published in the future
         should have a status_code of 404 NOT FOUND.
         """
@@ -104,7 +128,7 @@ class QuestionIndexDetailTest(TestCase):
                                    )
         self.assertEqual(response.status_code, 404)
 
-    def test_detail_view_with_past_question(self):
+    def test_detail_view_with_past_question_no_choice(self):
         """Detail view should display the question_text for any Question in the
         past
         """
@@ -112,12 +136,55 @@ class QuestionIndexDetailTest(TestCase):
         response = self.client.get(reverse('polls:detail',
                                            kwargs={'pk': past_question.id, })
                                    )
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_view_with_past_question_with_choice(self):
+        """Detail view should display the question_text for any Question in the
+        past
+        """
+        past_question = create_question(question_text="Past", days=-20)
+        c = create_choice_for_question(question=past_question,
+                                       choice_text="Choice P1")
+        response = self.client.get(reverse('polls:detail',
+                                           kwargs={'pk': past_question.id, })
+                                   )
         self.assertContains(response, past_question.question_text,
                             status_code=200)
+        self.assertContains(response, c.choice_text)
 
 
-# class QuestionResultsTest(TestCase):
+class QuestionResultsViewTest(TestCase):
 
-#     def test_results_view_with_future_question(self):
-#         future_question = create_question(question_text="Future", days=30)
+    def test_results_view_with_a_future_question(self):
+        """The results view that points to a question published in the future
+        should have a status_code of 404 NOT FOUND.
+        """
+        future_question = create_question(question_text="Future", days=20)
+        response = self.client.get(reverse('polls:results',
+                                           kwargs={'pk': future_question.id, })
+                                   )
+        self.assertEqual(response.status_code, 404)
 
+    def test_results_view_with_past_question_no_choice(self):
+        """results view should display the question_text for any Question in the
+        past
+        """
+        past_question = create_question(question_text="Past", days=-20)
+        response = self.client.get(reverse('polls:results',
+                                           kwargs={'pk': past_question.id, })
+                                   )
+        self.assertEqual(response.status_code, 404)
+
+    def test_results_view_with_past_question_with_choice(self):
+        """results view should display the question_text for any Question in the
+        past
+        """
+        past_question = create_question(question_text="Past", days=-20)
+        c = create_choice_for_question(question=past_question,
+                                       choice_text="Choice P1")
+        response = self.client.get(reverse('polls:results',
+                                           kwargs={'pk': past_question.id, })
+                                   )
+        self.assertContains(response, past_question.question_text,
+                            status_code=200)
+        self.assertContains(response, c.choice_text)

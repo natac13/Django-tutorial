@@ -25,9 +25,14 @@ class IndexView(generic.ListView):
         published in the future."""
         # Question.objects.filter() returns a queryset containing Questions
         # whose published date is less than or equal to (earlier) timezone.now
+        choice_question_id_list = [x.question.id for x in Choice.objects.all()]
         # NOTE 11.
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by(
-            '-pub_date')[:5]
+        return Question.objects.filter(
+                    pub_date__lte=timezone.now()
+                ).filter(
+                    pk__in=choice_question_id_list
+                ).order_by(
+                    '-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -35,7 +40,13 @@ class DetailView(generic.DetailView):
     template_name = 'polls/detail.html'
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte=timezone.now())
+        # x is the Choice object which has an question.id that relates it to
+        # the Question database. Builds a list of only those numbers.
+        choice_question_id_list = [x.question.id for x in Choice.objects.all()]
+        return Question.objects.filter(
+                    pub_date__lte=timezone.now()
+                ).filter(
+                    pk__in=choice_question_id_list)
 
 
 class ResultsView(generic.DetailView):
@@ -43,7 +54,11 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
     def get_queryset(self):
-        return Question.objects.filter(pub_date__lte=timezone.now())
+        choice_question_id_list = [x.question.id for x in Choice.objects.all()]
+        return Question.objects.filter(
+                    pub_date__lte=timezone.now()
+                ).filter(
+                    pk__in=choice_question_id_list)
 
 
 def vote(request, question_id):

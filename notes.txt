@@ -105,3 +105,8 @@ test method then nothing will be in the database to show on the view.
 When working with the object.get() object.filter() or object.exclude() I can take
 the parameter and append to it '__' and a 'Field lookups' from the docs. It is
 the MySQL WHERE part. I can also chain them together.
+
+12. TACKLING THE QUESTIONS WITHOUT CHOICES
+I want to implement the part about not showing question that do not have choices
+to them. I have worked it out so that I build a list of question.id's from
+the Choice models based off their foreign keys.
