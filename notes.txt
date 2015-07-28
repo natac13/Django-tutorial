@@ -92,3 +92,16 @@ templates to match the new default context variables – but it’s a lot easier
 to just tell Django to use the variable you want.
 
 More info can be found in a bookmark. Label Generic views.
+
+10. MY CONFUSION ABOUT TESTING VIEWS.
+I was confused about the first view test on the view returning no question.
+This was due to when working with the setup_test_environment() it does not create
+a temporary testing database and therefore was running against the normal
+Question database. So I was wondering how this test would pass, until I recalled
+that with testing a separate database is made so if no Question is made in that
+test method then nothing will be in the database to show on the view.
+
+11. ABOUT QUERYSETS AND THE FILTER() METHOD
+When working with the object.get() object.filter() or object.exclude() I can take
+the parameter and append to it '__' and a 'Field lookups' from the docs. It is
+the MySQL WHERE part. I can also chain them together.
