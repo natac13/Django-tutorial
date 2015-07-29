@@ -188,3 +188,20 @@ class QuestionResultsViewTest(TestCase):
         self.assertContains(response, past_question.question_text,
                             status_code=200)
         self.assertContains(response, c.choice_text)
+
+    def test_results_view_with_past_question_with_two_choices(self):
+        """results view should display the question_text for any Question in the
+        past
+        """
+        past_question = create_question(question_text="Past", days=-20)
+        c1 = create_choice_for_question(question=past_question,
+                                        choice_text="Choice P1")
+        c2 = create_choice_for_question(question=past_question,
+                                        choice_text="Choice P2")
+        response = self.client.get(reverse('polls:results',
+                                           kwargs={'pk': past_question.id, })
+                                   )
+        self.assertContains(response, past_question.question_text,
+                            status_code=200)
+        self.assertContains(response, c1.choice_text)
+        self.assertContains(response, c2.choice_text)
